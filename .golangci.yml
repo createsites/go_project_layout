@@ -1,0 +1,76 @@
+issues:
+  exclude-rules:
+    - path: config/config
+      linters:
+        - govet
+
+linters-settings:
+  gci:
+    sections:
+      - standard
+      - default
+      - prefix(github.com/golang-school/layout)
+  cyclop:
+    max-complexity: 15
+  funlen:
+    lines: 80
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+  goconst:
+    min-len: 2
+    min-occurrences: 2
+    ignore-tests: true
+    match-constant: false
+    numbers: true
+    min: 2
+    max: 2
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - experimental
+      - opinionated
+      - performance
+      - style
+    disabled-checks:
+      - dupImport
+      - unnecessaryBlock
+      - whyNoLint
+  gofumpt:
+    extra-rules: true
+  govet:
+    check-shadowing: true
+    enable-all: true
+  misspell:
+    locale: US
+
+linters:
+  enable-all: true
+  disable:
+    - structcheck
+    - nosnakecase
+    - varcheck
+    - deadcode
+    - maligned
+    - exhaustivestruct
+    - golint
+    - interfacer
+    - scopelint
+    - lll
+    - nolintlint
+    - prealloc
+    - paralleltest
+    - exhaustruct
+    - ifshort
+    - nonamedreturns
+    - varnamelen
+    - gomnd
+    - promlinter
+    - tagliatelle
+    - dupl
+    - ireturn
+    - tagalign
+    - depguard
+    - dupword
+
+
