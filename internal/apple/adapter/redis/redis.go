@@ -1,10 +1,16 @@
 package redis
 
-type Redis struct{}
+import (
+	"github.com/redis/go-redis/v9"
+	"time"
+)
 
-func New() (*Redis, error) {
-	return &Redis{}, nil
+const ttl = time.Hour
+
+type Redis struct {
+	client *redis.Client
 }
 
-func (r *Redis) Close() {
+func New(client *redis.Client) *Redis {
+	return &Redis{client: client}
 }

@@ -1,7 +1,6 @@
-package pineapple
+package entity
 
 import (
-	"github.com/golang-school/layout/internal/apple/entity"
 	"github.com/google/uuid"
 )
 
@@ -17,11 +16,11 @@ type PineApple struct {
 // New validate and create new PineApple
 func New(name, status string) (PineApple, error) {
 	if name == "" {
-		return PineApple{}, entity.ErrNameInvalid
+		return PineApple{}, ErrNameInvalid
 	}
 
 	if status == "" {
-		return PineApple{}, entity.ErrStatusInvalid
+		return PineApple{}, ErrStatusInvalid
 	}
 
 	return PineApple{

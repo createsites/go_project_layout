@@ -2,14 +2,25 @@ package redis
 
 import (
 	"context"
-	"github.com/golang-school/layout/internal/apple/entity/apple"
-
+	"encoding/json"
+	"fmt"
+	"github.com/golang-school/layout/internal/apple/entity"
 	"github.com/golang-school/layout/pkg/tracer"
 )
 
-func (r *Redis) PutApple(ctx context.Context, a apple.Apple) error {
+func (r *Redis) PutApple(ctx context.Context, a entity.Apple) error {
 	ctx, span := tracer.Start(ctx, "redis PutApple")
 	defer tracer.End(span)
+
+	data, err := json.Marshal(a)
+	if err != nil {
+		return fmt.Errorf("json.Marshal: %w", err)
+	}
+
+	err = r.client.Set(ctx, a.ID.String(), data, ttl).Err()
+	if err != nil {
+		return fmt.Errorf("r.client.Set: %w", err)
+	}
 
 	return nil
 }

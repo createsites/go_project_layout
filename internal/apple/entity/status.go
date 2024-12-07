@@ -1,4 +1,4 @@
-package pineapple
+package entity
 
 type Status int
 

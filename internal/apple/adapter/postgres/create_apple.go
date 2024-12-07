@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 	"github.com/doug-martin/goqu/v9"
-	"github.com/golang-school/layout/internal/apple/entity/apple"
+	"github.com/golang-school/layout/internal/apple/entity"
 	"github.com/golang-school/layout/pkg/tracer"
 )
 
-func (p *Postgres) CreateApple(ctx context.Context, a apple.Apple) (err error) {
+func (p *Postgres) CreateApple(ctx context.Context, a entity.Apple) (err error) {
 	ctx, span := tracer.Start(ctx, "postgres CreateApple")
 	defer tracer.End(span)
 

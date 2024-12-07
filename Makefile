@@ -1,6 +1,6 @@
 export
 
-DB_MIGRATE_URL = postgres://login:pass@localhost:15432/db-name?sslmode=disable
+DB_MIGRATE_URL = postgres://login:pass@localhost:5432/db-name?sslmode=disable
 MIGRATE_PATH = ./migration/postgres/apple
 
 up:
@@ -8,7 +8,7 @@ up:
 	docker compose logs -f
 
 down:
-	docker compose -f down --remove-orphans
+	docker compose down
 
 run: mod
 	go run ./cmd/app

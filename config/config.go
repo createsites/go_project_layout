@@ -3,8 +3,11 @@ package config
 import (
 	"fmt"
 	"github.com/golang-school/layout/pkg/http_server"
+	"github.com/golang-school/layout/pkg/kafka_reader"
+	"github.com/golang-school/layout/pkg/kafka_writer"
 	"github.com/golang-school/layout/pkg/logger"
 	"github.com/golang-school/layout/pkg/postgres"
+	"github.com/golang-school/layout/pkg/redis"
 	"github.com/golang-school/layout/pkg/sentry"
 	"github.com/golang-school/layout/pkg/tracer"
 	"github.com/joho/godotenv"
@@ -17,12 +20,15 @@ type App struct {
 }
 
 type Config struct {
-	App      App
-	HTTP     http_server.Config
-	Postgres postgres.Config
-	Tracer   tracer.Config
-	Logger   logger.Config
-	Sentry   sentry.Config
+	App         App
+	HTTP        http_server.Config
+	Postgres    postgres.Config
+	KafkaReader kafka_reader.Config
+	KafkaWriter kafka_writer.Config
+	Redis       redis.Config
+	Tracer      tracer.Config
+	Logger      logger.Config
+	Sentry      sentry.Config
 }
 
 func New() (Config, error) {

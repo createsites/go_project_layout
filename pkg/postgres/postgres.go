@@ -15,11 +15,11 @@ type Config struct {
 	DBName   string `envconfig:"POSTGRES_DB_NAME"  required:"true"`
 }
 
-type Postgres struct {
-	pool *pgxpool.Pool
+type Pool struct {
+	*pgxpool.Pool
 }
 
-func New(ctx context.Context, c Config) (*Postgres, error) {
+func New(ctx context.Context, c Config) (*Pool, error) {
 	dsn := fmt.Sprintf("user=%s password=%s port=%s host=%s dbname=%s",
 		c.User,
 		c.Password,
@@ -38,13 +38,9 @@ func New(ctx context.Context, c Config) (*Postgres, error) {
 		return nil, fmt.Errorf("pgxpool.NewWithConfig: %w", err)
 	}
 
-	return &Postgres{pool: pool}, nil
+	return &Pool{Pool: pool}, nil
 }
 
-func (p *Postgres) Pool() *pgxpool.Pool {
-	return p.pool
-}
-
-func (p *Postgres) Close() {
-	p.pool.Close()
+func (p *Pool) Close() {
+	p.Pool.Close()
 }

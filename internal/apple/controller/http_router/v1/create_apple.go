@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/golang-school/layout/internal/apple/dto"
 	"github.com/golang-school/layout/internal/apple/entity"
+	"github.com/golang-school/layout/pkg/render"
 	"github.com/rs/zerolog/log"
 	"net/http"
 
@@ -37,24 +38,24 @@ func (h *Handlers) CreateApple(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch {
 		case errors.Is(err, entity.ErrNotFound):
+			log.Error().Err(err).Msg("uc.CreateApple: not found")
 			http.Error(w, "not found", http.StatusNotFound)
 
 			return
 
 		case errors.Is(err, entity.ErrUUIDInvalid), errors.Is(err, entity.ErrStatusInvalid):
+			log.Error().Err(err).Msg("uc.CreateApple: validate error")
 			http.Error(w, "validate error", http.StatusBadRequest)
 
 			return
 
 		default:
-			log.Error().Err(err).Msg("uc.CreateApple")
+			log.Error().Err(err).Msg("uc.CreateApple: internal error")
 			http.Error(w, "internal error", http.StatusInternalServerError)
 
 			return
 		}
 	}
 
-	_ = output
-
-	w.WriteHeader(http.StatusOK)
+	render.JSON(w, output)
 }

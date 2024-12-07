@@ -4,22 +4,22 @@ import (
 	"context"
 	"fmt"
 	"github.com/golang-school/layout/internal/apple/dto"
-	"github.com/golang-school/layout/internal/apple/entity/apple"
+	"github.com/golang-school/layout/internal/apple/entity"
 	"github.com/google/uuid"
 
 	"github.com/golang-school/layout/pkg/tracer"
 )
 
-func (u *UseCases) CreateApple(ctx context.Context, input dto.CreateAppleInput) (dto.CreateAppleOutput, error) {
+func (u *UseCase) CreateApple(ctx context.Context, input dto.CreateAppleInput) (dto.CreateAppleOutput, error) {
 	ctx, span := tracer.Start(ctx, "usecase CreateApple")
 	defer tracer.End(span)
 
 	var output dto.CreateAppleOutput
 
-	a := apple.Apple{
+	a := entity.Apple{
 		ID:     uuid.New(),
 		Name:   input.Name,
-		Status: apple.StatusNew,
+		Status: entity.StatusNew,
 	}
 
 	err := u.postgres.CreateApple(ctx, a)
@@ -32,7 +32,7 @@ func (u *UseCases) CreateApple(ctx context.Context, input dto.CreateAppleInput) 
 		return output, fmt.Errorf("u.redis.PutApple: %w", err)
 	}
 
-	event := apple.CreateEvent{
+	event := entity.CreateEvent{
 		ID:   a.ID,
 		Name: input.Name,
 	}

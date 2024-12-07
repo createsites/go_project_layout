@@ -4,15 +4,14 @@ import (
 	"context"
 	"fmt"
 	"github.com/golang-school/layout/internal/apple/dto"
-	"github.com/golang-school/layout/internal/apple/entity/apple"
-	"github.com/golang-school/layout/internal/apple/entity/pineapple"
+	"github.com/golang-school/layout/internal/apple/entity"
 	"github.com/google/uuid"
 
 	"github.com/golang-school/layout/pkg/tracer"
 	"github.com/golang-school/layout/pkg/transaction"
 )
 
-func (u *UseCases) CreatePineApple(ctx context.Context, _ dto.CreatePineAppleInput) (dto.CreatePineAppleOutput, error) {
+func (u *UseCase) CreatePineApple(ctx context.Context, _ dto.CreatePineAppleInput) (dto.CreatePineAppleOutput, error) {
 	ctx, span := tracer.Start(ctx, "usecase AddBanana")
 	defer tracer.End(span)
 
@@ -25,12 +24,12 @@ func (u *UseCases) CreatePineApple(ctx context.Context, _ dto.CreatePineAppleInp
 
 	defer transaction.Rollback(ctx)
 
-	err = u.postgres.CreateApple(ctx, apple.Apple{})
+	err = u.postgres.CreateApple(ctx, entity.Apple{})
 	if err != nil {
 		return output, fmt.Errorf("u.postgres.CreateApple: %w", err)
 	}
 
-	err = u.postgres.CreatePineApple(ctx, pineapple.PineApple{})
+	err = u.postgres.CreatePineApple(ctx, entity.PineApple{})
 	if err != nil {
 		return output, fmt.Errorf("u.postgres.CreatePineApple: %w", err)
 	}

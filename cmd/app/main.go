@@ -18,6 +18,11 @@ func main() {
 
 	logger.Init(c.Logger)
 
+	err = sentry.Init(c.Sentry)
+	if err != nil {
+		log.Error().Err(err).Msg("sentry.Init")
+	}
+
 	defer sentry.Close()
 
 	err = tracer.Init(c.Tracer)

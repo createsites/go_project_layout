@@ -1,10 +1,11 @@
 package kafka_producer
 
-type KafkaProducer struct{}
+import "github.com/segmentio/kafka-go"
 
-func New() (*KafkaProducer, error) {
-	return &KafkaProducer{}, nil
+type Producer struct {
+	writer *kafka.Writer
 }
 
-func (p *KafkaProducer) Close() {
+func New(writer *kafka.Writer) *Producer {
+	return &Producer{writer: writer}
 }

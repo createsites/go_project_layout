@@ -4,62 +4,71 @@ import (
 	"context"
 	"fmt"
 	"github.com/golang-school/layout/config"
-	"github.com/golang-school/layout/internal/apple/adapter/kafka_producer"
-	"github.com/golang-school/layout/internal/apple/adapter/redis"
-	"github.com/golang-school/layout/internal/apple/usecase"
+	"github.com/golang-school/layout/pkg/http_server"
+	"github.com/golang-school/layout/pkg/kafka_writer"
 	"github.com/golang-school/layout/pkg/postgres"
+	"github.com/golang-school/layout/pkg/redis"
+	"github.com/golang-school/layout/pkg/router"
 	"github.com/rs/zerolog/log"
 	"os"
 	"os/signal"
 	"syscall"
-
-	"github.com/golang-school/layout/pkg/http_server"
 )
 
-func Run(c config.Config) error {
+type Dependencies struct {
+	Postgres    *postgres.Pool
+	KafkaWriter *kafka_writer.Writer
+	Redis       *redis.Client
+}
+
+func Run(c config.Config) (err error) {
 	ctx := context.Background()
 
-	postgres, err := postgres.New(ctx, c.Postgres)
+	var deps Dependencies
+
+	deps.Postgres, err = postgres.New(ctx, c.Postgres)
 	if err != nil {
 		return fmt.Errorf("postgres.New: %w", err)
 	}
 
-	defer postgres.Close()
-
-	kafka, err := kafka_producer.New()
+	deps.KafkaWriter, err = kafka_writer.New(c.KafkaWriter)
 	if err != nil {
-		return fmt.Errorf("kafka_producer.New: %w", err)
+		return fmt.Errorf("kafka_writer.New: %w", err)
 	}
 
-	defer kafka.Close()
-
-	redis, err := redis.New()
+	deps.Redis, err = redis.New(c.Redis)
 	if err != nil {
 		return fmt.Errorf("redis.New: %w", err)
 	}
 
-	defer redis.Close()
+	defer deps.Postgres.Close()
+	defer deps.KafkaWriter.Close()
+	defer deps.Redis.Close()
 
-	// AppleDomain
-	appleUseCases := usecase.New(postgres, kafka, redis)
+	httpRouter := router.New()
 
-	router := NewHTTPRouter(appleUseCases)
+	AppleDomain(httpRouter, deps)
 
-	s := http_server.New(router, c.HTTP.Port)
-	defer s.Close()
+	httpServer := http_server.New(httpRouter, c.HTTP.Port)
+	defer httpServer.Close()
 
-	waiting()
+	waiting(httpServer)
 
 	return nil
 }
 
-func waiting() {
+func waiting(httpServer *http_server.Server) {
 	log.Info().Msg("App started!")
 
 	wait := make(chan os.Signal, 1)
 	signal.Notify(wait, os.Interrupt, syscall.SIGTERM)
 
-	<-wait
+	select {
+	case i := <-wait:
+		log.Info().Msg("App got signal: " + i.String())
+	case err := <-httpServer.Notify():
+		log.Error().Err(err).Msg("App got notify: httpServer.Notify")
+	}
 
 	log.Info().Msg("App is stopping...")
 }

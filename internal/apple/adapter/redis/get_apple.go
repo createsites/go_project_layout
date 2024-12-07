@@ -2,15 +2,34 @@ package redis
 
 import (
 	"context"
-	"github.com/golang-school/layout/internal/apple/entity/apple"
-	"github.com/google/uuid"
-
+	"encoding/json"
+	"errors"
+	"fmt"
+	"github.com/golang-school/layout/internal/apple/entity"
 	"github.com/golang-school/layout/pkg/tracer"
+	"github.com/google/uuid"
+	"github.com/redis/go-redis/v9"
 )
 
-func (r *Redis) GetApple(ctx context.Context, id uuid.UUID) (apple.Apple, error) {
+func (r *Redis) GetApple(ctx context.Context, id uuid.UUID) (entity.Apple, error) {
 	ctx, span := tracer.Start(ctx, "redis GetApple")
 	defer tracer.End(span)
 
-	return apple.Apple{ID: id, Status: "from redis"}, nil
+	var apple entity.Apple
+
+	data, err := r.client.Get(ctx, id.String()).Bytes()
+	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			return apple, entity.ErrNotFound
+		}
+
+		return apple, fmt.Errorf("r.client.Get: %w", err)
+	}
+
+	err = json.Unmarshal(data, &apple)
+	if err != nil {
+		return apple, fmt.Errorf("json.Unmarshal: %w", err)
+	}
+
+	return apple, nil
 }
