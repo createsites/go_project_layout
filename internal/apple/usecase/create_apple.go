@@ -5,14 +5,13 @@ import (
 	"fmt"
 	"github.com/golang-school/layout/internal/apple/dto"
 	"github.com/golang-school/layout/internal/apple/entity"
+	"github.com/golang-school/layout/pkg/otel/tracer"
 	"github.com/google/uuid"
-
-	"github.com/golang-school/layout/pkg/tracer"
 )
 
 func (u *UseCase) CreateApple(ctx context.Context, input dto.CreateAppleInput) (dto.CreateAppleOutput, error) {
 	ctx, span := tracer.Start(ctx, "usecase CreateApple")
-	defer tracer.End(span)
+	defer span.End()
 
 	var output dto.CreateAppleOutput
 

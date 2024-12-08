@@ -4,13 +4,13 @@ import (
 	"context"
 	"fmt"
 	"github.com/golang-school/layout/internal/apple/entity"
-	"github.com/golang-school/layout/pkg/tracer"
+	"github.com/golang-school/layout/pkg/otel/tracer"
 	"github.com/segmentio/kafka-go"
 )
 
 func (p *Producer) CreateEvent(ctx context.Context, e entity.CreateEvent) error {
 	ctx, span := tracer.Start(ctx, "kafka_producer UpdateEvent")
-	defer tracer.End(span)
+	defer span.End()
 
 	m := kafka.Message{
 		Key:   []byte(e.ID.String()),

@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/golang-school/layout/internal/apple/entity"
-	"github.com/golang-school/layout/pkg/tracer"
+	"github.com/golang-school/layout/pkg/otel/tracer"
 )
 
 func (r *Redis) PutApple(ctx context.Context, a entity.Apple) error {
 	ctx, span := tracer.Start(ctx, "redis PutApple")
-	defer tracer.End(span)
+	defer span.End()
 
 	data, err := json.Marshal(a)
 	if err != nil {

@@ -30,4 +30,6 @@ func (c *Client) Close() {
 	if err != nil {
 		log.Error().Err(err).Msg("redis.Close")
 	}
+
+	log.Info().Msg("Redis closed")
 }

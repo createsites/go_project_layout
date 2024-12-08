@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"fmt"
+	"github.com/rs/zerolog/log"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -43,4 +44,6 @@ func New(ctx context.Context, c Config) (*Pool, error) {
 
 func (p *Pool) Close() {
 	p.Pool.Close()
+
+	log.Info().Msg("Postgres closed")
 }

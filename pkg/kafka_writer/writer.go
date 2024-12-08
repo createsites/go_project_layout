@@ -29,4 +29,6 @@ func (w *Writer) Close() {
 	if err != nil {
 		log.Error().Err(err).Msg("kafka_writer.Close")
 	}
+
+	log.Info().Msg("Kafka writer closed")
 }

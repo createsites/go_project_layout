@@ -6,14 +6,14 @@ import (
 	"errors"
 	"fmt"
 	"github.com/golang-school/layout/internal/apple/entity"
-	"github.com/golang-school/layout/pkg/tracer"
+	"github.com/golang-school/layout/pkg/otel/tracer"
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 )
 
 func (r *Redis) GetApple(ctx context.Context, id uuid.UUID) (entity.Apple, error) {
 	ctx, span := tracer.Start(ctx, "redis GetApple")
-	defer tracer.End(span)
+	defer span.End()
 
 	var apple entity.Apple
 

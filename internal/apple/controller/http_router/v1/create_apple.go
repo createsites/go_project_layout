@@ -5,16 +5,16 @@ import (
 	"errors"
 	"github.com/golang-school/layout/internal/apple/dto"
 	"github.com/golang-school/layout/internal/apple/entity"
+	"github.com/golang-school/layout/pkg/otel/tracer"
 	"github.com/golang-school/layout/pkg/render"
 	"github.com/rs/zerolog/log"
+	"go.opentelemetry.io/otel/attribute"
 	"net/http"
-
-	"github.com/golang-school/layout/pkg/tracer"
 )
 
 func (h *Handlers) CreateApple(w http.ResponseWriter, r *http.Request) {
 	ctx, span := tracer.Start(r.Context(), "http/v1 CreateApple")
-	defer tracer.End(span)
+	defer span.End()
 
 	input := dto.CreateAppleInput{}
 
@@ -52,6 +52,9 @@ func (h *Handlers) CreateApple(w http.ResponseWriter, r *http.Request) {
 		default:
 			log.Error().Err(err).Msg("uc.CreateApple: internal error")
 			http.Error(w, "internal error", http.StatusInternalServerError)
+
+			span.SetAttributes(attribute.KeyValue{Key: "error", Value: attribute.StringValue(err.Error())})
+			tracer.SetStatus(span, err)
 
 			return
 		}

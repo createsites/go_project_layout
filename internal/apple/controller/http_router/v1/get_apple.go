@@ -5,8 +5,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/golang-school/layout/internal/apple/dto"
 	"github.com/golang-school/layout/internal/apple/entity"
+	"github.com/golang-school/layout/pkg/otel/tracer"
 	"github.com/golang-school/layout/pkg/render"
-	"github.com/golang-school/layout/pkg/tracer"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"net/http"
@@ -14,7 +14,7 @@ import (
 
 func (h *Handlers) GetApple(w http.ResponseWriter, r *http.Request) {
 	ctx, span := tracer.Start(r.Context(), "http/v1 GetApple")
-	defer tracer.End(span)
+	defer span.End()
 
 	var (
 		input dto.GetAppleInput

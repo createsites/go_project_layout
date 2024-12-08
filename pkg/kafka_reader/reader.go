@@ -31,4 +31,6 @@ func (r *Reader) Close() {
 	if err != nil {
 		log.Error().Err(err).Msg("kafka_reader.Close")
 	}
+
+	log.Info().Msg("Kafka reader closed")
 }

@@ -3,8 +3,10 @@ package app
 import (
 	"context"
 	"fmt"
+	"github.com/go-chi/chi/v5"
 	"github.com/golang-school/layout/config"
 	"github.com/golang-school/layout/pkg/http_server"
+	"github.com/golang-school/layout/pkg/kafka_reader"
 	"github.com/golang-school/layout/pkg/kafka_writer"
 	"github.com/golang-school/layout/pkg/postgres"
 	"github.com/golang-school/layout/pkg/redis"
@@ -16,40 +18,51 @@ import (
 )
 
 type Dependencies struct {
+	// Adapters
 	Postgres    *postgres.Pool
 	KafkaWriter *kafka_writer.Writer
 	Redis       *redis.Client
+
+	// Controllers
+	RouterHTTP  *chi.Mux
+	KafkaReader *kafka_reader.Reader
 }
 
-func Run(c config.Config) (err error) {
-	ctx := context.Background()
-
+func Run(ctx context.Context, c config.Config) (err error) {
 	var deps Dependencies
 
+	// Adapters
 	deps.Postgres, err = postgres.New(ctx, c.Postgres)
 	if err != nil {
 		return fmt.Errorf("postgres.New: %w", err)
 	}
+	defer deps.Postgres.Close()
 
 	deps.KafkaWriter, err = kafka_writer.New(c.KafkaWriter)
 	if err != nil {
 		return fmt.Errorf("kafka_writer.New: %w", err)
 	}
+	defer deps.KafkaWriter.Close()
 
 	deps.Redis, err = redis.New(c.Redis)
 	if err != nil {
 		return fmt.Errorf("redis.New: %w", err)
 	}
-
-	defer deps.Postgres.Close()
-	defer deps.KafkaWriter.Close()
 	defer deps.Redis.Close()
 
-	httpRouter := router.New()
+	// Controllers
+	deps.RouterHTTP = router.New()
 
-	AppleDomain(httpRouter, deps)
+	deps.KafkaReader, err = kafka_reader.New(c.KafkaReader)
+	if err != nil {
+		return fmt.Errorf("kafka_reader.New: %w", err)
+	}
+	defer deps.KafkaReader.Close()
 
-	httpServer := http_server.New(httpRouter, c.HTTP.Port)
+	// Domains
+	AppleDomain(deps)
+
+	httpServer := http_server.New(deps.RouterHTTP, c.HTTP.Port)
 	defer httpServer.Close()
 
 	waiting(httpServer)

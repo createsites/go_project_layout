@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/golang-school/layout/internal/apple/dto"
-	"github.com/golang-school/layout/pkg/tracer"
+	"github.com/golang-school/layout/pkg/otel/tracer"
 )
 
 func (u *UseCase) GetApple(ctx context.Context, input dto.GetAppleInput) (dto.GetAppleOutput, error) {
 	ctx, span := tracer.Start(ctx, "usecase GetApple")
-	defer tracer.End(span)
+	defer span.End()
 
 	var output dto.GetAppleOutput
 

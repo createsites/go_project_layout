@@ -5,15 +5,15 @@ import (
 	"fmt"
 	"github.com/golang-school/layout/internal/apple/dto"
 	"github.com/golang-school/layout/internal/apple/entity"
+	"github.com/golang-school/layout/pkg/otel/tracer"
 	"github.com/google/uuid"
 
-	"github.com/golang-school/layout/pkg/tracer"
 	"github.com/golang-school/layout/pkg/transaction"
 )
 
 func (u *UseCase) CreatePineApple(ctx context.Context, _ dto.CreatePineAppleInput) (dto.CreatePineAppleOutput, error) {
 	ctx, span := tracer.Start(ctx, "usecase AddBanana")
-	defer tracer.End(span)
+	defer span.End()
 
 	var output dto.CreatePineAppleOutput
 
